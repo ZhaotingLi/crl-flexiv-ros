@@ -249,6 +249,8 @@ void FlexivHardwareInterface::read(
         internal_joint_position_command_ = joint_position_state_;
     }
 
+
+    // to do, need to change the publish rate, curent 1000hz too fast and make the rosbag quite big
     publishExternalForce();
 }
 

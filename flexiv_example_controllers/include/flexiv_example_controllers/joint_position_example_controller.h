@@ -26,6 +26,9 @@ class JointPositionExampleController : public controller_interface::MultiInterfa
   std::vector<hardware_interface::JointHandle> position_joint_handles_;
   ros::Duration elapsed_time_;
   std::array<double, 7> initial_pose_{};
+
+  std::array<double, 7> planned_trajectory{0.0, 0.0, 0.0, 1.57, 0.0, 0.0, 0.0};
+  double time_total_trajectory = 5.0; // second
 };
 
 }  // namespace franka_example_controllers
