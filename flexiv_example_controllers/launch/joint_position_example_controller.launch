@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <launch>
-  <include file="$(find flexiv_bringup)/launch/rizon_control.launch" pass_all_args="true" >
+  <include file="$(find flexiv_bringup)/launch/rizon_hw_control.launch" pass_all_args="true" >
     <arg name="use_rviz" value="false" />
   </include>
   <arg name="arm_id" default="fr3"/>
