@@ -1,3 +1,8 @@
+$ cd /home/lzt/catkin_crl/src/flexiv_ros/flexiv_hardware/rdk/example_py
+$ python display_robot_states.py  192.168.2.100 192.168.2.104 
+
+
+
 $ roslaunch flexiv_bringup rizon_control.launch robot_ip:=192.168.2.100 local_ip:=192.168.2.104 rizon_type:=rizon4s
 
 $ roslaunch flexiv_moveit_config moveit_control.launch robot_ip:=192.168.2.100 local_ip:=192.168.2.104 rizon_type:=rizon4s
