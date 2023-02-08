@@ -27,6 +27,8 @@
 #include "flexiv/Robot.hpp"
 #include "flexiv_msgs/ExternalForce.h"
 
+#include <sensor_msgs/JointState.h>
+
 namespace flexiv_hardware {
 /**
  * @brief This class handles the interface between the ROS system and the
@@ -239,6 +241,7 @@ protected:
     std::vector<double> joint_position_state_;
     std::vector<double> joint_velocity_state_;
     std::vector<double> joint_effort_state_;
+    std::vector<double> joint_ext_tau_state_;
     // External force
     std::vector<double> ext_force_in_tcp_;
     std::vector<double> ext_force_in_base_;
@@ -262,6 +265,9 @@ protected:
     std::unique_ptr<
         realtime_tools::RealtimePublisher<flexiv_msgs::ExternalForce>>
         ext_force_in_base_pub_;
+    std::unique_ptr<
+        realtime_tools::RealtimePublisher<sensor_msgs::JointState>>
+        joints_state_ext_tau_pub_;
 };
 } // namespace flexiv_hardware
 

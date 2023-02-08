@@ -105,17 +105,18 @@ void JointPositionExampleController::update(const ros::Time& /*time*/,
     }
     
     for (size_t i = 0; i < 7; ++i) {
-        if (i == 4) {
-        position_joint_handles_[i].setCommand(initial_pose_[i] - delta_angle);
-        } else {
+        if (i == 5) {
         position_joint_handles_[i].setCommand(initial_pose_[i] + delta_angle);
+        } else {
+        // position_joint_handles_[i].setCommand(initial_pose_[i] + delta_angle);
+        position_joint_handles_[i].setCommand(initial_pose_[i]);
         }
     }
 
   // stay static so that it's easier to find the external torque
-  // for (size_t i = 0; i < 7; ++i) {
-  //   position_joint_handles_[i].setCommand(initial_pose_[i]);
-  // }
+//   for (size_t i = 0; i < 7; ++i) {
+//     position_joint_handles_[i].setCommand(initial_pose_[i]);
+//   }
 }
 
 }  // namespace franka_example_controllers

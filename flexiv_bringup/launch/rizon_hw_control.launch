@@ -4,7 +4,7 @@
     <arg name="local_ip" doc="IP address of the workstation PC (local)."/>
     <arg name="rizon_type" default="rizon4" doc="Type of the Flexiv Rizon robot" />
     <arg name="controllers_file" default="$(find flexiv_bringup)/config/rizon_controllers.yaml" doc="YAML file with the controllers configuration."/>
-    <arg name="controllers" default="joint_state_controller position_joint_trajectory_controller" />
+    <arg name="controllers" default="joint_state_controller" />
     <arg name="use_rviz" default="true" />
 
     <!-- Load URDF -->
@@ -22,6 +22,15 @@
     <!-- Spawn controller manager -->
     <!-- <node name="ros_control_controller_manager" pkg="controller_manager" type="spawner" respawn="false" output="screen" args="$(arg controllers)" /> -->
 
-    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" output="screen"/>
+    <!-- <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" output="screen">
+        <rosparam param="source_list">[/external_torque_observer/joint_state_external_tau_estimated] </rosparam>
+        <param name="rate" value="30"/>
+    </node> -->
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" >
+    <rosparam param="source_list">[/external_torque_observer/joint_state_external_tau_estimated] </rosparam>
+    <param name="rate" value="30"/>
+    </node>
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+
     <node name="rviz" pkg="rviz" type="rviz" args="-d $(find flexiv_description)/rviz/view_rizon.rviz" respawn="false" if="$(arg use_rviz)"/>
 </launch>

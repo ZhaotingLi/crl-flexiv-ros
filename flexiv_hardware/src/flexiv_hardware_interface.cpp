@@ -23,6 +23,7 @@ bool FlexivHardwareInterface::init(
     joint_position_state_.resize(num_joints_, 0.0);
     joint_velocity_state_.resize(num_joints_, 0.0);
     joint_effort_state_.resize(num_joints_, 0.0);
+    joint_ext_tau_state_.resize(num_joints_, 0.0);
 
     // External force
     ext_force_in_tcp_.resize(6, 0.0);
@@ -58,6 +59,17 @@ bool FlexivHardwareInterface::init(
     ext_force_in_base_pub_.reset(
         new realtime_tools::RealtimePublisher<flexiv_msgs::ExternalForce>(
             root_nh, "external_force_in_base", 1));
+    joints_state_ext_tau_pub_.reset(new realtime_tools::RealtimePublisher<sensor_msgs::JointState>(
+            root_nh, "/external_torque_observer/joint_state_external_tau_estimated", 1));
+
+    {
+        // std::lock_guard<realtime_tools::RealtimePublisher<sensor_msgs::JointState>> lock(
+        //     joints_state_ext_tau_pub_);
+        joints_state_ext_tau_pub_->msg_.name.resize(7);
+        joints_state_ext_tau_pub_->msg_.position.resize(7);
+        joints_state_ext_tau_pub_->msg_.velocity.resize(7);
+        joints_state_ext_tau_pub_->msg_.effort.resize(7);
+    }
 
     ROS_INFO_STREAM_NAMED(
         "flexiv_hardware_interface", "Loaded Flexiv Hardware Interface.");
@@ -201,6 +213,21 @@ void FlexivHardwareInterface::publishExternalForce()
             ext_force_in_base_pub_->unlockAndPublish();
         }
     }
+    if (joints_state_ext_tau_pub_) {
+        std::vector<std::string> joint_names{"joint1","joint2", "joint3", "joint4", "joint5", "joint6", "joint7"};
+        if (joints_state_ext_tau_pub_->trylock()){
+            for (size_t i = 0; i < 7; i++) {
+                joints_state_ext_tau_pub_->msg_.name[i] = joint_names[i];
+                joints_state_ext_tau_pub_->msg_.position[i] = joint_position_state_[i];
+                joints_state_ext_tau_pub_->msg_.velocity[i] = joint_velocity_state_[i];
+                joints_state_ext_tau_pub_->msg_.effort[i] = joint_ext_tau_state_[i];
+                // joints_state_ext_tau_pub_.msg_.effort[i] = gravity[i];
+            }
+            joints_state_ext_tau_pub_->msg_.header.frame_id = "base_link";
+            // joints_state_ext_tau_pub_.msg_.header.seq = sequence_number_;
+            joints_state_ext_tau_pub_->unlockAndPublish();
+        }
+    }
 }
 
 void FlexivHardwareInterface::read(
@@ -214,6 +241,7 @@ void FlexivHardwareInterface::read(
         joint_position_state_ = robot_states.q;
         joint_velocity_state_ = robot_states.dtheta;
         joint_effort_state_ = robot_states.tau;
+        joint_ext_tau_state_ = robot_states.tauExt;
 
         ext_force_in_tcp_ = robot_states.extForceInTcpFrame;
         ext_force_in_base_ = robot_states.extForceInBaseFrame;
