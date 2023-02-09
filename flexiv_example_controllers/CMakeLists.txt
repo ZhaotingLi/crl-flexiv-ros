@@ -40,6 +40,7 @@ catkin_package(
 add_library(${PROJECT_NAME}
   SHARED
   src/joint_position_example_controller.cpp
+  src/joint_impedance_example_controller.cpp
 )
 
 

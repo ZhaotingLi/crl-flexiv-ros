@@ -4,4 +4,9 @@
         A controller that executes a short motion based on joint positions to demonstrate correct usage
         </description>
     </class>
+    <class name="flexiv_example_controllers/JointImpedanceExampleController" type="flexiv_example_controllers::JointImpedanceExampleController" base_class_type="controller_interface::ControllerBase">
+        <description>
+        A controller that executes a short motion based on joint positions to demonstrate correct usage
+        </description>
+    </class>
 </library>

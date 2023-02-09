@@ -251,7 +251,11 @@ void FlexivHardwareInterface::read(
 
 
     // to do, need to change the publish rate, curent 1000hz too fast and make the rosbag quite big
-    publishExternalForce();
+    publish_count ++;
+    if(publish_count > 5){
+       publishExternalForce();
+       publish_count = 0;
+    }
 }
 
 void FlexivHardwareInterface::write(

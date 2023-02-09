@@ -268,6 +268,8 @@ protected:
     std::unique_ptr<
         realtime_tools::RealtimePublisher<sensor_msgs::JointState>>
         joints_state_ext_tau_pub_;
+
+    int publish_count = 0;  // use to decrease the freq of the publisher 
 };
 } // namespace flexiv_hardware
 

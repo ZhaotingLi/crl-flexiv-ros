@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<launch>
+  <include file="$(find flexiv_bringup)/launch/rizon_hw_control.launch" pass_all_args="true" >
+    <arg name="use_rviz" value="true" />
+  </include>
+  <arg name="arm_id" default="fr3"/>
+  <rosparam command="load" file="$(find flexiv_example_controllers)/config/flexiv_example_controllers.yaml" subst_value="true" />
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen"  args="joint_impedance_example_controller"/>
+  <!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find flexiv_description)/rviz/view_rizon.rviz" respawn="false" if="$(arg use_rviz)"/> -->
+</launch>

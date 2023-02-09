@@ -8,3 +8,35 @@ joint_position_example_controller:
         - joint5
         - joint6
         - joint7
+
+joint_impedance_example_controller:
+    type: flexiv_example_controllers/JointImpedanceExampleController
+    joint_names:
+        - joint1
+        - joint2
+        - joint3
+        - joint4
+        - joint5
+        - joint6
+        - joint7
+    k_gains:
+        - 200.0
+        - 200.0
+        - 200.0
+        - 200.0
+        - 200.0
+        - 200.0
+        - 100.0
+    d_gains:
+        - 50.0
+        - 50.0
+        - 30.0
+        - 30.0
+        - 30.0
+        - 30.0
+        - 10.0
+    radius: 0.05
+    acceleration_time: 2.0
+    vel_max: 0.06
+    publish_rate: 200.0
+    coriolis_factor: 1.0
