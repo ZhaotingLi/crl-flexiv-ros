@@ -29,6 +29,12 @@
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>flexiv_msgs</exec_depend>
 
+  <build_depend>eigen_conversions</build_depend>
+  <build_depend>eigen</build_depend>
+
+  <exec_depend>eigen_conversions</exec_depend>
+  <exec_depend>eigen</exec_depend>
+
   <export>
     <hardware_interface plugin="${prefix}/flexiv_hardware_interface_plugin.xml"/>
   </export>

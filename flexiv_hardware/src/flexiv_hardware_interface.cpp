@@ -61,6 +61,8 @@ bool FlexivHardwareInterface::init(
             root_nh, "external_force_in_base", 1));
     joints_state_ext_tau_pub_.reset(new realtime_tools::RealtimePublisher<sensor_msgs::JointState>(
             root_nh, "/external_torque_observer/joint_state_external_tau_estimated", 1));
+    joints_state_pub_.reset(new realtime_tools::RealtimePublisher<sensor_msgs::JointState>(
+            root_nh, "/external_torque_observer/joint_state", 1));
 
     {
         // std::lock_guard<realtime_tools::RealtimePublisher<sensor_msgs::JointState>> lock(
@@ -69,6 +71,15 @@ bool FlexivHardwareInterface::init(
         joints_state_ext_tau_pub_->msg_.position.resize(7);
         joints_state_ext_tau_pub_->msg_.velocity.resize(7);
         joints_state_ext_tau_pub_->msg_.effort.resize(7);
+    }
+
+    {
+        // std::lock_guard<realtime_tools::RealtimePublisher<sensor_msgs::JointState>> lock(
+        //     joints_state_ext_tau_pub_);
+        joints_state_pub_->msg_.name.resize(7);
+        joints_state_pub_->msg_.position.resize(7);
+        joints_state_pub_->msg_.velocity.resize(7);
+        joints_state_pub_->msg_.effort.resize(7);
     }
 
     ROS_INFO_STREAM_NAMED(
@@ -154,6 +165,9 @@ bool FlexivHardwareInterface::initRobot()
     // Connect to the robot
     try {
         robot_ = std::make_unique<flexiv::Robot>(robot_ip_, local_ip_);
+        robot_model = std::make_shared<flexiv::Model>(robot_.get());
+        // flexiv::Model model(robot);
+        // robot_->loadModel(robot_model.get());
         ;
     } catch (const flexiv::Exception& e) {
         ROS_ERROR("Failed to connect to robot: %s", e.what());
@@ -228,6 +242,22 @@ void FlexivHardwareInterface::publishExternalForce()
             joints_state_ext_tau_pub_->unlockAndPublish();
         }
     }
+
+    if (joints_state_pub_) {
+        std::vector<std::string> joint_names{"joint1","joint2", "joint3", "joint4", "joint5", "joint6", "joint7"};
+        if (joints_state_pub_->trylock()){
+            for (size_t i = 0; i < 7; i++) {
+                joints_state_pub_->msg_.name[i] = joint_names[i];
+                joints_state_pub_->msg_.position[i] = joint_position_state_[i];
+                joints_state_pub_->msg_.velocity[i] = joint_velocity_state_[i];
+                joints_state_pub_->msg_.effort[i] = joint_effort_state_[i];
+                // joints_state_ext_tau_pub_.msg_.effort[i] = gravity[i];
+            }
+            joints_state_pub_->msg_.header.frame_id = "base_link";
+            // joints_state_ext_tau_pub_.msg_.header.seq = sequence_number_;
+            joints_state_pub_->unlockAndPublish();
+        }
+    }
 }
 
 void FlexivHardwareInterface::read(
@@ -247,6 +277,16 @@ void FlexivHardwareInterface::read(
         ext_force_in_base_ = robot_states.extForceInBaseFrame;
 
         internal_joint_position_command_ = joint_position_state_;
+
+        // dynamics model of the robot
+        robot_model->updateModel(robot_states.q, robot_states.dtheta);  // need to robot->loadModel firsts
+        // Get gravity vector
+        auto gravity = robot_model->getGravityForce();
+        // std::cout<<"gravity: ";
+        // for (size_t i = 0; i < 7; ++i) {
+        //   std::cout<<gravity[i] <<" ";
+        // }
+        // std::cout<<std::endl;
     }
 
 

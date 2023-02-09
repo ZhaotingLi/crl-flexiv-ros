@@ -25,6 +25,7 @@
 
 // Flexiv
 #include "flexiv/Robot.hpp"
+#include "flexiv/Model.hpp"
 #include "flexiv_msgs/ExternalForce.h"
 
 #include <sensor_msgs/JointState.h>
@@ -269,7 +270,12 @@ protected:
         realtime_tools::RealtimePublisher<sensor_msgs::JointState>>
         joints_state_ext_tau_pub_;
 
+    std::unique_ptr<realtime_tools::RealtimePublisher<sensor_msgs::JointState>> joints_state_pub_;
+
     int publish_count = 0;  // use to decrease the freq of the publisher 
+
+    // dynamic model
+    std::shared_ptr<flexiv::Model> robot_model;
 };
 } // namespace flexiv_hardware
 

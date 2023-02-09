@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 option(BUILD_FOR_ARM64 "Link to RDK library for arm64 processor, otherwise link to x64" OFF)
 
 find_package(catkin REQUIRED COMPONENTS
+eigen_conversions
   controller_manager
   flexiv_msgs
   hardware_interface
@@ -22,6 +23,7 @@ catkin_package(
   INCLUDE_DIRS
     include
   CATKIN_DEPENDS
+    eigen_conversions
     controller_manager
     flexiv_msgs
     hardware_interface

@@ -7,6 +7,7 @@ $ roslaunch flexiv_bringup rizon_control.launch robot_ip:=192.168.2.100 local_ip
 
 $ roslaunch flexiv_moveit_config moveit_control.launch robot_ip:=192.168.2.100 local_ip:=192.168.2.104 rizon_type:=rizon4s
 
+$ roslaunch flexiv_example_controllers joint_impedance_example_controller.launch robot_ip:=192.168.2.100 local_ip:=192.168.2.104 rizon_type:=rizon4s
 
 # Flexiv ROS
 
