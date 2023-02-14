@@ -64,6 +64,11 @@ bool FlexivHardwareInterface::init(
     joints_state_pub_.reset(new realtime_tools::RealtimePublisher<sensor_msgs::JointState>(
             root_nh, "/external_torque_observer/joint_state", 1));
 
+
+    robot_model_pub_.reset(new realtime_tools::RealtimePublisher<flexiv_msgs::RobotModel>(
+            root_nh, "/robot_model", 1));
+
+
     {
         // std::lock_guard<realtime_tools::RealtimePublisher<sensor_msgs::JointState>> lock(
         //     joints_state_ext_tau_pub_);
@@ -81,6 +86,13 @@ bool FlexivHardwareInterface::init(
         joints_state_pub_->msg_.velocity.resize(7);
         joints_state_pub_->msg_.effort.resize(7);
     }
+
+    // {
+    //     robot_model_pub_->msg_.gravity.resize(7);
+    //     robot_model_pub_->msg_.coriolis_tau.resize(7);
+    // }
+    gravity_tau.resize(7);
+    coriolis_tau.resize(7);
 
     ROS_INFO_STREAM_NAMED(
         "flexiv_hardware_interface", "Loaded Flexiv Hardware Interface.");
@@ -258,6 +270,20 @@ void FlexivHardwareInterface::publishExternalForce()
             joints_state_pub_->unlockAndPublish();
         }
     }
+
+    if (robot_model_pub_) {
+        if (robot_model_pub_->trylock()){
+            for (size_t i = 0; i < 7; i++) {
+                // robot_model_pub_->msg_.name[i] = joint_names[i];
+                robot_model_pub_->msg_.gravity[i] = gravity_tau(i);
+                robot_model_pub_->msg_.coriolis_tau[i] = coriolis_tau(i);
+                // robot_model_pub_->msg_.effort[i] = joint_effort_state_[i];
+                // joints_state_ext_tau_pub_.msg_.effort[i] = gravity[i];
+            }
+            // joints_state_ext_tau_pub_.msg_.header.seq = sequence_number_;
+            robot_model_pub_->unlockAndPublish();
+        }
+    }
 }
 
 void FlexivHardwareInterface::read(
@@ -281,7 +307,9 @@ void FlexivHardwareInterface::read(
         // dynamics model of the robot
         robot_model->updateModel(robot_states.q, robot_states.dtheta);  // need to robot->loadModel firsts
         // Get gravity vector
-        auto gravity = robot_model->getGravityForce();
+        gravity_tau = robot_model->getGravityForce();
+        coriolis_tau = robot_model->getCoriolisForce();
+
         // std::cout<<"gravity: ";
         // for (size_t i = 0; i < 7; ++i) {
         //   std::cout<<gravity[i] <<" ";

@@ -29,6 +29,7 @@
 #include "flexiv_msgs/ExternalForce.h"
 
 #include <sensor_msgs/JointState.h>
+#include "flexiv_msgs/RobotModel.h"
 
 namespace flexiv_hardware {
 /**
@@ -247,6 +248,11 @@ protected:
     std::vector<double> ext_force_in_tcp_;
     std::vector<double> ext_force_in_base_;
 
+
+    // Dynamic Models
+    Eigen::VectorXd gravity_tau;
+    Eigen::VectorXd coriolis_tau;
+    
     // Commands
     std::vector<double> joint_position_command_;
     std::vector<double> joint_velocity_command_;
@@ -271,6 +277,9 @@ protected:
         joints_state_ext_tau_pub_;
 
     std::unique_ptr<realtime_tools::RealtimePublisher<sensor_msgs::JointState>> joints_state_pub_;
+    
+    std::unique_ptr<realtime_tools::RealtimePublisher<flexiv_msgs::RobotModel>> robot_model_pub_;
+
 
     int publish_count = 0;  // use to decrease the freq of the publisher 
 

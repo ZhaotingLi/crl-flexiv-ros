@@ -16,6 +16,7 @@ add_message_files(
   JointPosVel.msg
   Mode.msg
   RobotStates.msg
+  RobotModel.msg
 )
 
 ## Generate services in the 'srv' folder
