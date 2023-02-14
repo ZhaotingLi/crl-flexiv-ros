@@ -244,6 +244,7 @@ protected:
     std::vector<double> joint_velocity_state_;
     std::vector<double> joint_effort_state_;
     std::vector<double> joint_ext_tau_state_;
+    std::vector<double> joint_tau_des_state_;
     // External force
     std::vector<double> ext_force_in_tcp_;
     std::vector<double> ext_force_in_base_;

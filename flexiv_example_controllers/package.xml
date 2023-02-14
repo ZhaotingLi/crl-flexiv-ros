@@ -31,6 +31,13 @@
   <exec_depend>flexiv_msgs</exec_depend>
   <exec_depend>controller_interface</exec_depend>
 
+  <build_depend>eigen_conversions</build_depend>
+  <build_depend>eigen</build_depend>
+
+  <exec_depend>eigen_conversions</exec_depend>
+  <exec_depend>eigen</exec_depend>
+
+
   <export>
     <controller_interface plugin="${prefix}/flexiv_example_controllers_plugin.xml"/>
   </export>

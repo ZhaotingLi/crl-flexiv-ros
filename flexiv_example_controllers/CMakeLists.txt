@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # find dependencies
 find_package(catkin REQUIRED COMPONENTS
+eigen_conversions
   controller_interface
   controller_manager
   flexiv_msgs
@@ -24,6 +25,7 @@ catkin_package(
     include
   LIBRARIES flexiv_example_controllers
   CATKIN_DEPENDS
+    eigen_conversions
     controller_interface
     controller_manager
     flexiv_msgs

@@ -24,6 +24,7 @@ bool FlexivHardwareInterface::init(
     joint_velocity_state_.resize(num_joints_, 0.0);
     joint_effort_state_.resize(num_joints_, 0.0);
     joint_ext_tau_state_.resize(num_joints_, 0.0);
+    joint_tau_des_state_.resize(num_joints_, 0.0);
 
     // External force
     ext_force_in_tcp_.resize(6, 0.0);
@@ -277,6 +278,7 @@ void FlexivHardwareInterface::publishExternalForce()
                 // robot_model_pub_->msg_.name[i] = joint_names[i];
                 robot_model_pub_->msg_.gravity[i] = gravity_tau(i);
                 robot_model_pub_->msg_.coriolis_tau[i] = coriolis_tau(i);
+                robot_model_pub_->msg_.tau_des[i] = joint_tau_des_state_[i];
                 // robot_model_pub_->msg_.effort[i] = joint_effort_state_[i];
                 // joints_state_ext_tau_pub_.msg_.effort[i] = gravity[i];
             }
@@ -298,6 +300,7 @@ void FlexivHardwareInterface::read(
         joint_velocity_state_ = robot_states.dtheta;
         joint_effort_state_ = robot_states.tau;
         joint_ext_tau_state_ = robot_states.tauExt;
+        joint_tau_des_state_ = robot_states.tauDes;
 
         ext_force_in_tcp_ = robot_states.extForceInTcpFrame;
         ext_force_in_base_ = robot_states.extForceInBaseFrame;

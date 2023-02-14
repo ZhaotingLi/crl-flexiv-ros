@@ -12,6 +12,12 @@
 #include <ros/node_handle.h>
 #include <ros/time.h>
 
+#include "flexiv_msgs/RobotModel.h"
+
+
+#include <Eigen/Dense>
+#include <Eigen/Core>
+
 namespace flexiv_example_controllers {
 
 class JointImpedanceExampleController : public controller_interface::MultiInterfaceController<
@@ -45,6 +51,15 @@ class JointImpedanceExampleController : public controller_interface::MultiInterf
 
   std::vector<double> k_gains_;
   std::vector<double> d_gains_;
+
+  ros::Subscriber    robot_model_sub_;  // not gaurantee the real time performance, the robot should be quasi-static
+  void robotmodel_callback(const flexiv_msgs::RobotModel& msg);
+
+    // Dynamic Models
+  Eigen::VectorXd gravity_tau;
+  Eigen::VectorXd coriolis_tau;
+  std::array<double, 7> tau_des;
+
 };
 
 }  // namespace franka_example_controllers
