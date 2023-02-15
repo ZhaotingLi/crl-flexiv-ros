@@ -27,10 +27,6 @@ class JointImpedanceExampleController : public controller_interface::MultiInterf
   void starting(const ros::Time&) override;
   void update(const ros::Time&, const ros::Duration& period) override;
 
-  // Saturation
-  std::array<double, 7> saturateTorqueRate(
-      const std::array<double, 7>& tau_d_calculated,
-      const std::array<double, 7>& tau_J_d);  // NOLINT (readability-identifier-naming)
 
  private:
   hardware_interface::EffortJointInterface* effort_joint_interface_;
@@ -41,14 +37,7 @@ class JointImpedanceExampleController : public controller_interface::MultiInterf
   std::array<double, 7> planned_trajectory{0.0, 0.0, 0.0, 1.57, 0.0, 0.0, 0.0};
   double time_total_trajectory = 5.0; // second
 
-  // impedance controller parameters
-  static constexpr double kDeltaTauMax{1.0};
-  double radius_{0.1};
-  double acceleration_time_{2.0};
-  double vel_max_{0.05};
-  double angle_{0.0};
-  double vel_current_{0.0};
-
+  // parameters of joint impedance controller, should be set in the config file
   std::vector<double> k_gains_;
   std::vector<double> d_gains_;
 

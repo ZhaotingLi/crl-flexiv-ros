@@ -31,24 +31,6 @@ bool JointImpedanceExampleController::init(hardware_interface::RobotHW* robot_ha
     return false;
   }
 
-  if (!node_handle.getParam("radius", radius_)) {
-    ROS_INFO_STREAM(
-        "JointImpedanceExampleController: No parameter radius, defaulting to: " << radius_);
-  }
-  if (std::fabs(radius_) < 0.005) {
-    ROS_INFO_STREAM("JointImpedanceExampleController: Set radius to small, defaulting to: " << 0.1);
-    radius_ = 0.1;
-  }
-
-  if (!node_handle.getParam("vel_max", vel_max_)) {
-    ROS_INFO_STREAM(
-        "JointImpedanceExampleController: No parameter vel_max, defaulting to: " << vel_max_);
-  }
-  if (!node_handle.getParam("acceleration_time", acceleration_time_)) {
-    ROS_INFO_STREAM(
-        "JointImpedanceExampleController: No parameter acceleration_time, defaulting to: "
-        << acceleration_time_);
-  }
 
   if (!node_handle.getParam("k_gains", k_gains_) || k_gains_.size() != 7) {
     ROS_ERROR(
@@ -98,6 +80,8 @@ bool JointImpedanceExampleController::init(hardware_interface::RobotHW* robot_ha
   return true;
 }
 
+
+// not used currently, plan to use in future.
 void JointImpedanceExampleController::robotmodel_callback(const flexiv_msgs::RobotModel& msg){
   // receive the model info, which is published in flexiv_hardware_interface: robot_model_pub_
   for(int i = 0; i < 7; i ++){
@@ -119,46 +103,37 @@ void JointImpedanceExampleController::starting(const ros::Time& /* time */) {
 void JointImpedanceExampleController::update(const ros::Time& /*time*/,
                                             const ros::Duration& period) {
 
+    std::array<double, 7> q_des;   // desired joint state
+
     elapsed_time_ += period;
 
-    // double magnitude_delta = 0.2;  // {0.2, 0.45, 0.6 }analyse the relationship between the discrepency of the external torque and dq
-    // double delta_angle = M_PI / 16 * (1 - std::cos(M_PI / 5.0 * elapsed_time_.toSec())) * magnitude_delta;
+    // double time_now = elapsed_time_.toSec();
+    // double time_0_to_20 = int(time_now) % 20 + time_now - int(time_now) ;
 
 
-    // double time_now = 1 / 2.0 * elapsed_time_.toSec();
-    // double time_0_to_12 = int(time_now) % 12 + time_now - int(time_now) ;
-    // if(time_0_to_12 < 1){
-    // delta_angle = M_PI / 16 * (1 - std::cos(M_PI * time_now)) * magnitude_delta;
-    // }else if(time_0_to_12 < 2){
-    // delta_angle = M_PI / 8 * magnitude_delta;
-    // }else if(time_0_to_12 < 3){
-    // delta_angle = M_PI / 8 * magnitude_delta + M_PI / 16 * (1 - std::cos(M_PI * (time_now-2))) * magnitude_delta;
-    // }else if(time_0_to_12 < 4){
-    // delta_angle = M_PI / 4 * magnitude_delta;
-    // }else if(time_0_to_12 < 5){
-    // delta_angle = M_PI / 4 * magnitude_delta + M_PI / 16 * (1 - std::cos(M_PI * (time_now - 4))) * magnitude_delta;
-    // }else if(time_0_to_12 < 6){
-    // delta_angle = M_PI * 3 / 8 * magnitude_delta;
-    // }else if(time_0_to_12 < 7){
-    // delta_angle = M_PI / 4 * magnitude_delta + M_PI / 16 * (1 - std::cos(M_PI * (time_now - 5))) * magnitude_delta;
-    // }else if(time_0_to_12 < 8){
-    // delta_angle = M_PI * 2 / 8 * magnitude_delta;
-    // }else if(time_0_to_12 < 9){
-    // delta_angle = M_PI / 8 * magnitude_delta + M_PI / 16 * (1 - std::cos(M_PI * (time_now - 7))) * magnitude_delta;
-    // }else if(time_0_to_12 < 10){
-    // delta_angle = M_PI * 1 / 8 * magnitude_delta;
-    // }else if(time_0_to_12 < 11){
-    // delta_angle = M_PI / 16 * (1 - std::cos(M_PI * (time_now - 9))) * magnitude_delta;
+    // if(time_total_trajectory > time_0_to_20){
+    //     for (size_t i = 0; i < 7; ++i) {
+    //       q_des[i] = (planned_trajectory[i] - initial_pose_[i]) * time_0_to_20 / time_total_trajectory + initial_pose_[i];
+    //     }
+    // }else if(time_0_to_20 < 2 * time_total_trajectory){
+    //     for (size_t i = 0; i < 7; ++i) {
+    //       q_des[i] = planned_trajectory[i];
+    //     }
+    // }else if(time_0_to_20 < 3 * time_total_trajectory){
+    //     for (size_t i = 0; i < 7; ++i) {
+    //       q_des[i] = (initial_pose_[i] - planned_trajectory[i]) * (time_0_to_20 - 2 * time_total_trajectory) / time_total_trajectory + planned_trajectory[i];
+    //     }
     // }else{
-    // delta_angle = 0;
+    //     for (size_t i = 0; i < 7; ++i) {
+    //       q_des[i] = initial_pose_[i];
+    //     }
     // }
     
-    // desired joint state, during this test, just keep the home position
-    std::array<double, 7> q_des;
+    //// desired joint state, during this test, just keep the home position
     for (size_t i = 0; i < 7; ++i) {
-        if (i == 5) {
-          // q_des[i] = initial_pose_[i] + delta_angle;
-          q_des[i] = initial_pose_[i];
+        if (i == 4) {
+          q_des[i] = initial_pose_[i] + delta_angle;
+          // q_des[i] = initial_pose_[i];
         } else {
         // position_joint_handles_[i].setCommand(initial_pose_[i] + delta_angle);
           q_des[i] = initial_pose_[i];
@@ -180,66 +155,16 @@ void JointImpedanceExampleController::update(const ros::Time& /*time*/,
     // caculate current joint command
     std::array<double, 7> tau_d_calculated;
     for (size_t i = 0; i < 7; ++i) {
-      tau_d_calculated[i] = k_gains_[i] * (q_des[i] - q_now[i]) ;
-                             + d_gains_[i] * (0 - dq_now[i]) + gravity_tau(i) + coriolis_tau(i);
+      tau_d_calculated[i] = k_gains_[i] * (q_des[i] - q_now[i]) 
+                             + d_gains_[i] * (0 - dq_now[i]); //+ gravity_tau(i) + coriolis_tau(i);
     }
 
-    // bound the cacluded torque by the [desired tau + gravity tau] from the robot state
-    std::array<double, 7> tau_d_saturated = saturateTorqueRate(tau_d_calculated, tau_des);
-
+    
     for (size_t i = 0; i < 7; ++i) {
       effort_joint_handles_[i].setCommand(tau_d_calculated[i]);
     }
 }
 
-
-// move between the start pose and the goal pose
-// void JointImpedanceExampleController::update(const ros::Time& /*time*/,
-//                                             const ros::Duration& period) {
-
-//     //   double delta_angle = M_PI / 8 * (1 - std::cos(M_PI / 5.0 * elapsed_time_.toSec())) * 0.2;
-//     elapsed_time_ += period;
-
-//     // double magnitude_delta = 0.15;  // {0.2, 0.45, 0.6 }analyse the relationship between the discrepency of the external torque and dq
-//     // double delta_angle = M_PI / 16 * (1 - std::cos(M_PI / 5.0 * elapsed_time_.toSec())) * magnitude_delta;
-//     double time_now = elapsed_time_.toSec();
-//     double time_0_to_20 = int(time_now) % 20 + time_now - int(time_now) ;
-
-
-//     if(time_total_trajectory > time_0_to_20){
-//         for (size_t i = 0; i < 7; ++i) {
-//         double commanded_pos = (planned_trajectory[i] - initial_pose_[i]) * time_0_to_20 / time_total_trajectory + initial_pose_[i];
-//         position_joint_handles_[i].setCommand(commanded_pos);
-//         }
-//     }else if(time_0_to_20 < 2 * time_total_trajectory){
-//         for (size_t i = 0; i < 7; ++i) {
-//         double commanded_pos = planned_trajectory[i];
-//         position_joint_handles_[i].setCommand(commanded_pos);
-//         }
-//     }else if(time_0_to_20 < 3 * time_total_trajectory){
-//         for (size_t i = 0; i < 7; ++i) {
-//         double commanded_pos = (initial_pose_[i] - planned_trajectory[i]) * (time_0_to_20 - 2 * time_total_trajectory) / time_total_trajectory + planned_trajectory[i];
-//         position_joint_handles_[i].setCommand(commanded_pos);
-//         }
-//     }else{
-//         for (size_t i = 0; i < 7; ++i) {
-//         double commanded_pos = initial_pose_[i];
-//         position_joint_handles_[i].setCommand(commanded_pos);
-//         }
-//     }
-
-// }
-
-std::array<double, 7> JointImpedanceExampleController::saturateTorqueRate(
-    const std::array<double, 7>& tau_d_calculated,
-    const std::array<double, 7>& tau_J_d) {  // NOLINT (readability-identifier-naming)
-  std::array<double, 7> tau_d_saturated{};
-  for (size_t i = 0; i < 7; i++) {
-    double difference = tau_d_calculated[i] - tau_J_d[i] - gravity_tau(i);
-    tau_d_saturated[i] = tau_J_d[i] + std::max(std::min(difference, kDeltaTauMax), -kDeltaTauMax);
-  }
-  return tau_d_saturated;
-}
 
 }  // namespace franka_example_controllers
 
