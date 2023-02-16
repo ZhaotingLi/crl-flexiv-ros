@@ -132,8 +132,8 @@ void JointImpedanceExampleController::update(const ros::Time& /*time*/,
     //// desired joint state, during this test, just keep the home position
     for (size_t i = 0; i < 7; ++i) {
         if (i == 4) {
-          q_des[i] = initial_pose_[i] + delta_angle;
-          // q_des[i] = initial_pose_[i];
+          // q_des[i] = initial_pose_[i] + delta_angle;
+          q_des[i] = initial_pose_[i];
         } else {
         // position_joint_handles_[i].setCommand(initial_pose_[i] + delta_angle);
           q_des[i] = initial_pose_[i];
